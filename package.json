@@ -1,0 +1,23 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Amazon Mock App",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanccrawford/bamazon.git"
+  },
+  "author": "Ryan Crawford",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryanccrawford/bamazon/issues"
+  },
+  "homepage": "https://github.com/ryanccrawford/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^6.3.1",
+    "mysql": "^2.17.1"
+  }
+}
