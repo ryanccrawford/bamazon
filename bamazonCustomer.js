@@ -17,14 +17,8 @@ function startApp() {
     console.clear();
     connection.connect();
     cart = [];
-    getAllProducts(function (prducts) {
-        console.log(prducts[0].RowDataPacket)
-        var test = prducts.RowDataPacket
-        console.log(test)
-        var itemRow = prducts[0].RowDataPacket
-        console.log(itemRow)
-        console.log(itemRow);
-       displayProducts(prducts, whichItemToBuy)
+    getAllProducts(function (products) {
+       displayProducts(products, whichItemToBuy)
     });
 }
  
@@ -56,7 +50,7 @@ function whichItemToBuy(){
             }
         ]
     ).then(function (answer) {
-        
+        console.log("The answer from which item " + answer)
         getProduct(answer.item_id, howManyUnitsToBuy);
        
     })
@@ -66,12 +60,16 @@ function whichItemToBuy(){
 
 //READ DATABASE FUNCTIONS
 function getProduct(id, callback) {
-    var id = parseInt(id)
-    console.log(id)
-    connection.query('SELECT * FROM products WHERE item_id=?', [id], function (error, results) {
+    
+    console.log("the id that was passed to get product " + id)
+    var sql = `SELECT * FROM products WHERE item_id=${id}`
+    console.log("The sql being sent: " + sql)
+    connection.query(sql, function (error, results) {
         if (error) throw error;
         debugger;
-        callback(results)
+        console.log("this is the returned product")
+        console.log(results[0])
+        callback(results[0])
     });
 }
 function getAllProducts(callback) {
@@ -84,50 +82,68 @@ function getAllProducts(callback) {
 //UPDATE DATABASE FUNCTION
 //Pass a negitive number to decrease stock and pass a positive number to increase
 function updateStock(id, qty, callback) {
-    var qty = parseInt(qty)
+  
     var updateEquation = ""
     if (qty < 0) {
-        updateEquation = `stock_quantity-${qty}`
+        qty = -qty
+        updateEquation = `stock_quantity - ${qty}`
     } else if (qty >= 0) {
-        updateEquation = `stock_quantity+${qty}`
+        updateEquation = `stock_quantity + ${qty}`
     }
-    connection.query(`UPDATE products SET stock_quantity=${updateEquation} WHERE item_id=?`, [id], function (error, results) {
+    var sql = `UPDATE products SET stock_quantity=${updateEquation} WHERE item_id=${id}`
+    console.log(sql)
+    console.log(updateEquation)
+    connection.query(sql, function (error, results) {
         if (error) throw error;
-        console.log(results[0].RowDataPacket);
-        var itemRow = results[0].RowDataPacket
-        callback(itemRow)
+        var returnResults = {
+            result: results[0],
+            qtyOrdered: qty
+        }
+        console.log(returnResults)
+        callback(returnResults)
     });
 }
 
 
 
 function howManyUnitsToBuy(_itemRow) {
+    console.log("inside of howmany. This is the passed param ")
     console.log(_itemRow)
-    var item = _itemRow
-    var stockLevel = item.stock_quantity
+    var id = _itemRow.item_id
+    var stockLevel = _itemRow.stock_quantity
+    console.log("this is the stock quanity of the item: "+ stockLevel)
     inquirer.prompt(
         [
             {
                 type: 'input',
                 name: 'qty',
-                message: `How Many ${item.name} Would You Like, there are ${stockLevel} in stock`,
+                message: `How Many Would You Like?`,
                 validate: function (value) {
                     var pass = value.match(
                         /\d+/i
                     );
                     if (pass) {
-                        if (parseInt(value) <= parseInt(stockLevel))
-                        return true;
+                       return true;
                     }
 
-                    return `Not enough in stock. Please enter ${stockLevel} or less.`;
+                    return `Not a valid number.`;
                 }
             }
         ]
     ).then(function (answer) {
         var qtyOrdered = answer.qty
+        console.log('this is the returned answer ' + qtyOrdered)
+        console.log("this is the stock passed: " + stockLevel)
+        if (qtyOrdered === 0) {
+            getAllProducts(function (products) {
+                displayProducts(products, whichItemToBuy)
+            });
+        }
         if (checkQty(stockLevel, qtyOrdered)) {
-            buyItem(stockLevel, qtyOrdered, processOrder)
+            buyItem(id, qtyOrdered, processOrder)
+        } else {
+            console.log("Not enough Quantity of that Item.")
+            howManyUnitsToBuy(_itemRow)
         }
     })
     
@@ -138,14 +154,34 @@ function checkQty(number1, number2) {
     return number1 > number2
 }
 
-function buyItem(id, qty, callback){
-    console.log("Item database qty update gos here")
+function buyItem(id, qty, callback) {
+    qty = -qty
+
+    updateStock(id,qty,callback)
     
     
 }
 
 function processOrder(_result) {
+    console.log(_result)
+   var qty = _result.qtyOrdered
+    console.log("You just purchased " + qty + ".")
+    inquirer.prompt([{
+        type: "list",
+        name: "continue",
+        message: "Continue shopping?",
+        defualt: "Yes",
+        choices: ['Yes','No']
+    }]).then(function (answer) {
 
+        if (answer.continue === 'Yes') {
+            getAllProducts(function (products) {
+                displayProducts(products, whichItemToBuy)
+            });
+        } else {
+            exit()
+        }
+    })
 
 }
 
