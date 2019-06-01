@@ -4,7 +4,14 @@ A simple demostration of a CLI amazon style app. This app was made to show my sk
 This is a command Line app that requires you to have NodeJs, NPM and MySQL installed on your localhost.
 
 Usage:
-You must first use the sql files located in the data folder to create the database and table structure. You can also run the other sql scripts which will install test data (Only do this if you do not want to add your own data). 
+You must first use the sql files located in the data folder to create the database and table structure. You can also run the other sql scripts which will install test data (Only do this if you do not want to add your own data). Then you will need to create a .env file and inside it put your mysql user name and your mysql password like this
+
+.env file
+```
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=Rcc083178
+
+```
 
 Once done, simply run npm i to install the required node packages. 
 
@@ -27,5 +34,5 @@ Features:
   
   This application is for deminstartion purposes and is not a completed application. I created it to show that I can create Node applications and have the knowledge to create a more useful system.
 
-  
+
 
