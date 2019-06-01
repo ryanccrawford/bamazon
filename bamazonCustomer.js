@@ -6,6 +6,8 @@ const DATABASE = "bamazon";
 const colors = require('colors')
 const Table = require('cli-table3');
 var cart = [];
+
+
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : Keys.mysql.username,
@@ -215,10 +217,10 @@ function checkQty(number1, number2) {
 
 function buyItem(id, qty, callback) {
     qty = -qty
-
-    updateStock(id,qty,callback)
-   
-    
+    var cb = function () {
+        updateStock(id, qty, callback)
+    }
+    updateSales(id, -qty, cb) 
 }
 
 
@@ -254,7 +256,26 @@ function processOrder() {
     })
 
 }
+function updateSales(id, qtySold, callback) {
+    var storedAmount = 0.00
+    var sql = `SELECT product_sales, price FROM products WHERE item_id=${id}`
 
+    connection.query(sql, function (error, results) {
+        if (error) throw error;
+        var totalAmount = results[0].price * qtySold
+        storedAmount = results[0].product_sales + totalAmount
+
+        var sql = `UPDATE products SET product_sales=${storedAmount} WHERE item_id=${id}`
+        connection.query(sql, function (error, results2) {
+            if (error) throw error;
+            
+            callback()
+
+        });
+    });
+
+
+}
 
 function exit(){
     connection.end();

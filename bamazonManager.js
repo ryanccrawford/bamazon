@@ -1,19 +1,20 @@
 require("dotenv").config();
-const Keys = require("./keys.js");
-const inquirer = require("inquirer");
+const Keys = require("./keys.js")
 const mysql = require("mysql");
 const DATABASE = "bamazon";
-const colors = require('colors')
-const Table = require('cli-table3');
-var holder = []
-var cart = []
-
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
     host: 'localhost',
     user: Keys.mysql.username,
     password: Keys.mysql.password,
     database: DATABASE
 });
+const inquirer = require("inquirer");
+const colors = require('colors')
+const Table = require('cli-table3');
+var holder = []
+var cart = []
+
+
 
 startApp()
 
@@ -25,9 +26,6 @@ function startApp() {
     holder = [];
     clearScreen()
 }
-
-
-
 function displayProducts(products, callback) {
      
     var table = new Table({
@@ -77,7 +75,6 @@ function displayProducts(products, callback) {
     
     callback();
 }
-
 function showMenu() {
     
     
@@ -91,7 +88,6 @@ function showMenu() {
             defualt: "View All Products"
         }]
     ).then(function (answer) {
-
         switch (answer.doWhat) {
             case "View All Products":
                 viewAll()
@@ -109,32 +105,23 @@ function showMenu() {
                 exit()
             break
        }
-
     })
-
-
 }
-
 function viewAll() { 
 
     getAllProducts(display)
 
 }
-
 function display(products) {
      console.clear()
     displayProducts(products, clearScreen)
 }
 function clearScreen(){
-   
-    showMenu()
+ showMenu()
 }
 function viewLow() { 
- 
-    getLowInvPro(display)
-
+   getLowInvPro(display)
 }
-
 function AddInv() {
 
     inquirer.prompt(
@@ -175,8 +162,6 @@ function AddInv() {
         updateStock(answer.id, answer.amount, callback)
     })
 }
-
-
 function AddNew() {
     console.log("Adding New Product")
     inquirer.prompt(
@@ -250,28 +235,6 @@ function getLowInvPro(callback) {
         callback(products);
     });
 }
-
-function getProduct(id, callback) {
-
-    //console.log("the id that was passed to get product " + id)
-    var sql = `SELECT * FROM products WHERE item_id=${id}`
-    //console.log("The sql being sent: " + sql)
-    connection.query(sql, function (error, results) {
-        if (error) throw error;
-        debugger;
-
-        if (results.length < 1) {
-
-            getAllProducts(function (products) {
-                displayProducts(products, whichItemToBuy)
-                console.log("\r\nItem not found. Check the id and try again.")
-            });
-        } else {
-            callback(results[0])
-        }
-    });
-}
-
 function getAllProducts(callback) {
 
     connection.query('SELECT * FROM products', function (error, results, fields) {
@@ -284,26 +247,7 @@ function getAllProducts(callback) {
         callback(products);
     });
 }
-
-function getPrice(id, qty, callback) {
-    var sql = `SELECT price, product_name FROM products Where item_id =${id}`
-    var item = {
-        item: null,
-        qty: qty
-    }
-    cart.push(item)
-    connection.query(sql, function (error, results) {
-        if (error) throw error;
-        var temp = cart.pop()
-        temp.item = results[0]
-        cart.push(temp)
-
-        callback(processOrder);
-    });
-}
-
 //UPDATE DATABASE FUNCTION
-//Pass a negitive number to decrease stock and pass a positive number to increase
 function updateStock(id, qty, callback) {
 
     var updateEquation = ""
@@ -322,21 +266,6 @@ function updateStock(id, qty, callback) {
 
     });
 }
-
-
-
-
-function showPrice() {
-    var amount = 0.00
-    cart.forEach(function (itemobj) {
-        // console.log(itemobj)
-        amount += (itemobj.item.price * -parseFloat(itemobj.qty))
-    })
-    console.log("Your total purchace was $ " + amount)
-
-}
-
-
 function exit() {
     inquirer.prompt([{
         type: "list",
