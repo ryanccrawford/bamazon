@@ -29,33 +29,26 @@ function mainMenu() {
                 exitApp()
                 break
         }
-        runScript(script, mainMenu)
+        mainEntry(script, mainMenu)
     })
 }
 function exitApp(){
     process.exit(0)
 }
 
-function runScript(scriptPath, callback) {
-
-    // keep track of whether callback has been invoked to prevent multiple invocations
-    var invoked = false;
-
-    var process = childProcess.fork(scriptPath);
-
-    // listen for errors as they may prevent the exit event from firing
+function mainEntry(_script, callback) {
+    var invoked = false
+    var process = childProcess.fork(_script)
     process.on('error', function (err) {
-        if (invoked) return;
-        invoked = true;
-        callback(err);
-    });
-
-    // execute the callback once the process has finished running
+        if (invoked) return
+        invoked = true
+        callback(err)
+    })
     process.on('exit', function (code) {
-        if (invoked) return;
-        invoked = true;
-        var err = code === 0 ? null : new Error('exit code ' + code);
-        callback(err);
-    });
+        if (invoked) return
+        invoked = true
+        var err = code === 0 ? null : new Error(code)
+        callback(err)
+    })
 
 }

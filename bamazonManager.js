@@ -2,20 +2,23 @@ require("dotenv").config();
 const Keys = require("./keys.js")
 const mysql = require("mysql");
 const DATABASE = "bamazon";
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: Keys.mysql.username,
-    password: Keys.mysql.password,
-    database: DATABASE
-});
 const inquirer = require("inquirer");
 const colors = require('colors')
 const Table = require('cli-table3');
 var holder = []
 var cart = []
 
+//connects to the database
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: Keys.mysql.username,
+    password: Keys.mysql.password,
+    database: DATABASE
+});
 
 
+
+//Mian entru function
 startApp()
 
 
@@ -26,8 +29,9 @@ function startApp() {
     holder = [];
     clearScreen()
 }
+//
 function displayProducts(products, callback) {
-     
+
     var table = new Table({
         head: [colors.blue('Id'), colors.blue('Product Name'),
             colors.blue('Department'), colors.blue('Price'),
@@ -51,7 +55,7 @@ function displayProducts(products, callback) {
                     hAlign: 'center',
                     content: colors.red(row.stock_quantity)
                 }
-    
+
             } else {
                 sl = {
                     hAlign: 'center',
@@ -70,58 +74,63 @@ function displayProducts(products, callback) {
             sl
         ])
     })
-   
+
     console.log(table.toString());
-    
+
     callback();
 }
+
 function showMenu() {
-    
-    
+
+
     inquirer.prompt(
         [{
             type: 'list',
             name: 'doWhat',
             message: "Select a Task",
-            choices: ["View All Products", "View Low Inventory", "Add Inventory", "Add New Products","Exit"
-            ],
+            choices: ["View All Products", "View Low Inventory", "Add Inventory", "Add New Products", "Exit"],
             defualt: "View All Products"
         }]
     ).then(function (answer) {
         switch (answer.doWhat) {
             case "View All Products":
                 viewAll()
-            break
+                break
             case "View Low Inventory":
                 viewLow()
-            break
+                break
             case "Add Inventory":
                 AddInv()
-            break
+                break
             case "Add New Products":
                 AddNew()
-            break
+                break
             default:
                 exit()
-            break
-       }
+                break
+        }
     })
 }
-function viewAll() { 
+
+function viewAll() {
 
     getAllProducts(display)
 
 }
+
 function display(products) {
-     console.clear()
+    console.clear()
     displayProducts(products, clearScreen)
 }
-function clearScreen(){
- showMenu()
+
+function clearScreen() {
+    showMenu()
 }
-function viewLow() { 
-   getLowInvPro(display)
+
+function viewLow() {
+    getLowInvPro(display)
 }
+
 function AddInv() {
 
     inquirer.prompt(
@@ -153,7 +162,7 @@ function AddInv() {
 
                 return `Not a valid number.`;
             }
-             
+
         }]
     ).then(function (answer) {
         var callback = function () {
@@ -162,6 +171,7 @@ function AddInv() {
         updateStock(answer.id, answer.amount, callback)
     })
 }
+
 function AddNew() {
     console.log("Adding New Product")
     inquirer.prompt(
@@ -203,15 +213,16 @@ function AddNew() {
             }
         }]
 
-         
-     ).then(function (answer) {
+
+    ).then(function (answer) {
         var callback = function () {
             getAllProducts(display)
         }
-         insertNew(answer, callback)
-     })
+        insertNew(answer, callback)
+    })
 
 }
+
 function insertNew(answerObj, callback) {
 
     var set = `('${answerObj.product_name}', '${answerObj.department_name}', ${answerObj.price}, ${answerObj.stock_quantity})`
@@ -235,6 +246,7 @@ function getLowInvPro(callback) {
         callback(products);
     });
 }
+
 function getAllProducts(callback) {
 
     connection.query('SELECT * FROM products', function (error, results, fields) {
@@ -261,11 +273,12 @@ function updateStock(id, qty, callback) {
 
     connection.query(sql, function (error, results) {
         if (error) throw error;
-      
+
         callback()
 
     });
 }
+
 function exit() {
     inquirer.prompt([{
         type: "list",
@@ -273,15 +286,15 @@ function exit() {
         message: "Are you Sure you want to exit?",
         defualt: "Yes",
         choices: ['Yes', 'No']
-    }]).then(function(answer){
+    }]).then(function (answer) {
 
         if (answer.continue === 'Yes') {
-          
+
             connection.end();
             process.exit(0);
         } else {
-             clearScreen()
+            clearScreen()
         }
     })
-   
+
 }

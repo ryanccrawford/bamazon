@@ -49,9 +49,22 @@ function viewProductSalesByDepartment(callback) {
 function displaySalesByDepartment(results, callback) {
 
     var table = new Table({
-        head: [colors.blue('Id'), colors.blue('Department Name'),
-            colors.blue('Cost'), colors.blue('Sales'),
-            colors.blue('Profit')
+        head: [{
+            hAlign: 'center',
+            content: colors.white('Id')
+        },
+            {
+                hAlign: 'center',
+                content: colors.white('Department Name')
+            }, {
+                hAlign: 'center', content: colors.white('Cost')
+            }, {
+                hAlign: 'center',
+                content: colors.white('Sales')
+            }, {
+                hAlign: 'center',
+                content: colors.white('Profit')
+            }
         ]
     }, {
         colWidths: [3, 35, 5, 5, 5]
@@ -60,17 +73,18 @@ function displaySalesByDepartment(results, callback) {
     results.forEach(function (row) {
         var did = row.department_id
         table.push([
-            did,
-            colors.green(row.department_name), {
-             hAlign: 'right', content: ("$ " + row.over_head_cost)
+            colors.white(did), {
+                hAlign: 'center', content: colors.blue(row.department_name)
+            }, {
+             hAlign: 'right', content: colors.red("$ " + row.over_head_cost)
             },
             {
                 hAlign: 'right',
-                content: colors.cyan("$ " + row.product_sales)
+                content: colors.green("$ " + row.product_sales)
             },
              {
                  hAlign: 'right',
-                 content: colors.cyan("$ " + row.total_profit)
+                 content: row.total_profit < 0 ? colors.red("$ " + row.total_profit): colors.white("$ " + row.total_profit)
              }
         ])
     })
@@ -99,8 +113,8 @@ function insertNewDepartment(department, callback) {
          var sql = `SELECT department_id, department_name from departments`
             connection.query(sql, function (error, results2) {
                 if (error) throw error;
-                console.log("New department has been Created.")
-               viewDepartments(results2, callback)
+                console.log(`New department, ${department} has been Created.`)
+                    viewDepartments(results2, callback)
                 
             });
             
