@@ -1,4 +1,7 @@
 # Bamazon
+
+A great video to watch is https://youtu.be/rr36W4xO6bo. It shows you all the features of my app. Such as the main.js, customer, manager and supervisor screens.
+
 A simple demostration of a CLI amazon style app. This app was made to show my skill in developing a practical backend system that connects to and stores data in a MySQL data base.
 
 This is a command Line app that requires you to have NodeJs, NPM and MySQL installed on your localhost.
@@ -18,10 +21,11 @@ Once done, simply run npm i to install the required node packages.
 You now should be able to run ```$ node main.js```
 to start the app. 
 
-The app has 3 screens:
-1. Customer Facing 
-2. Manager (For adding new stock and new products)
-3. Supervisor, for running reports and adding departments
+The app has 4 screens:
+1. Splash Screen and Jump Screen to get to the other Screens
+2. Customer Facing 
+3. Manager (For adding new stock and new products)
+4. Supervisor, for running reports and adding departments
 
 You can select any of the menu items and the app will take you to the one you select
 
