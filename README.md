@@ -8,8 +8,8 @@ You must first use the sql files located in the data folder to create the databa
 
 .env file
 ```
-MYSQL_USERNAME=root
-MYSQL_PASSWORD=Rcc083178
+MYSQL_USERNAME=mysql_username_goes_here
+MYSQL_PASSWORD=mysql_password_goes_here
 
 ```
 
